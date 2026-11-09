@@ -25,7 +25,7 @@ def encrypt_password(data: EncryptionRequest):
 @app.post("/decrypt", response_model=DecryptionResponse)
 def decrypt_password(data: DecryptionRequest):
     try:
-        decrypted_password = decrypt(data.ciphertext, data.key, data.nonce)
+        decrypted_password = decrypt(data.ciphertext, data.nonce, data.key)
     except InvalidEncryptionData as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
@@ -33,5 +33,5 @@ def decrypt_password(data: DecryptionRequest):
 
 
 @app.get("/key")
-def generate_key():
+def generate_new_key():
     return generate_key()
