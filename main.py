@@ -1,11 +1,19 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 
-from app.core.exceptions import InvalidEncryptionData
+from app.core.exceptions import AppException
 from app.schemas.passwords import EncryptionResponse, EncryptionRequest, DecryptionResponse, DecryptionRequest
 from app.services.encrypt import encrypt, decrypt, generate_key
 
 
 app = FastAPI()
+
+@app.exception_handler(AppException)
+async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail}
+    )
 
 @app.get("/")
 def root():
@@ -14,22 +22,12 @@ def root():
 
 @app.post("/encrypt", response_model=EncryptionResponse)
 def encrypt_password(data: EncryptionRequest):
-    try:
-        encrypted_password = encrypt(data.password, data.key)
-    except InvalidEncryptionData as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    return encrypted_password
+    return encrypt(data.password, data.key)
 
 
 @app.post("/decrypt", response_model=DecryptionResponse)
 def decrypt_password(data: DecryptionRequest):
-    try:
-        decrypted_password = decrypt(data.ciphertext, data.nonce, data.key)
-    except InvalidEncryptionData as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-
-    return decrypted_password
+    return decrypt(data.ciphertext, data.nonce, data.key)
 
 
 @app.get("/key")
