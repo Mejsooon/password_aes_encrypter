@@ -52,6 +52,9 @@ def decrypt(ciphertext: str, nonce: str, key: str) -> dict[str, str]:
     except ValueError as exc:
         raise InvalidEncryptionData("Ciphertext is not a valid base64") from exc
 
+    if len(ciphertext_bytes) < TAG_SIZE:
+        raise InvalidEncryptionData("Ciphertext is too short")
+
     try:
         nonce_bytes = base64.b64decode(nonce, validate=True)
     except ValueError as exc:
