@@ -17,7 +17,7 @@ from app.services.encrypt import decrypt, encrypt, generate_key
 
 client = TestClient(app)
 
-NOT_BASE64 = "to nie jest base64!"
+NOT_BASE64 = "to nie base64!"
 TOO_SHORT = base64.b64encode(b"za krotki").decode("utf-8")  # Poprawny base64, ale tylko 9 bajtów
 
 
